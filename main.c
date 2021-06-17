@@ -47,5 +47,8 @@ void main() {
       }
     } else if (!strcmp(cmd, "cp")) {
     }
+    else {
+        handleCommand("Ah");
+    }
   }
 }

@@ -1,5 +1,7 @@
 #include "./init.c"
 
+#include <sys/types.h>
+
 void launch_process(process* p, pid_t pgid, int infile, int outfile,
     int errfile, int foreground);
 
