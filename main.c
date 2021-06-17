@@ -10,7 +10,7 @@
 void main() {
   init_shell();
   char cmd[30];
-  char args[30];
+  char args[1024];
 
   while (1) {
     char cwd[PATH_MAX];
@@ -20,8 +20,8 @@ void main() {
     fscanf(stdin, "%s", cmd);
     fgets(args, 100, stdin);
 
-    printf("Command Entered : %s ", cmd);
-    printf("Arguments entered : %s ", args);
+    printf("Command Entered : %s \n", cmd);
+    printf("Arguments entered : %s \n", args);
     size_t i = 1;
     while (1) {
       if (args[i] == 10) {
@@ -30,7 +30,7 @@ void main() {
         i++;
       }
     }
-    while (i < 30) {
+    while (i < 1024) {
       args[i] = 0;
       i++;
     }
@@ -48,7 +48,7 @@ void main() {
     } else if (!strcmp(cmd, "cp")) {
     }
     else {
-        handleCommand("Ah");
+        handleCommand(args);
     }
   }
 }

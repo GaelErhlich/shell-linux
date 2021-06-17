@@ -1,1 +1,1 @@
-void handleCommand(char* cmd);
+void handleCommand(char cmd[1024]);
