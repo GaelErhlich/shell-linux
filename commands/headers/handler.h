@@ -1,3 +1,1 @@
-#include <string>
-
-void handleCommand(string cmd);
+void handleCommand();

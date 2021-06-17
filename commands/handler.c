@@ -1,18 +1,9 @@
-#include "headers/handler.h"
+//#include "headers/handler.h"
 
-#include <string>
-
-#include "" // job.h
+#include "../datastructures/headers/job.h"
 
 
-using std::string;
 
-
-void handleCommand(string cmd) {
-	
-}
-
-
-int main(int argc, char* argv[]) {
-	
+void handleCommand() {
+	printf("qeqchose\n");
 }

@@ -1,6 +1,9 @@
 #include <sys/types.h>
 #include <termios.h>
+#include <signal.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 pid_t shell_pgid;
 struct termios shell_tmodes;
