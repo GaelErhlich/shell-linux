@@ -1,3 +1,5 @@
+#include "core/init.h"
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

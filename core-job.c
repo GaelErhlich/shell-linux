@@ -1,6 +1,16 @@
-#include "./init.c"
+#include "core/job.h"
 
-void launch_process(process *p, pid_t pgid, int infile, int outfile,
+#include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "datastructures/info/jobinfo.h"
+
+
+
+
+void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
                     int errfile, int foreground) {
   pid_t pid;
 
@@ -45,8 +55,8 @@ void launch_process(process *p, pid_t pgid, int infile, int outfile,
   exit(1);
 }
 
-void launch_job(job *j, int foreground) {
-  process *p;
+void launch_job(struct job *j, int foreground) {
+  struct process *p;
   pid_t pid;
   int mypipe[2], infile, outfile;
 
@@ -99,7 +109,7 @@ void launch_job(job *j, int foreground) {
     put_job_in_background(j, 0);
 }
 
-void put_job_in_foreground(job *j, int cont) {
+void put_job_in_foreground(struct job *j, int cont) {
   /* Put the job into the foreground.  */
   tcsetpgrp(shell_terminal, j->pgid);
 
@@ -121,7 +131,7 @@ void put_job_in_foreground(job *j, int cont) {
   tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
 }
 
-void put_job_in_background(job *j, int cont) {
+void put_job_in_background(struct job *j, int cont) {
   /* Send the job a continue signal, if necessary.  */
   if (cont)
     if (kill(-j->pgid, SIGCONT) < 0)
