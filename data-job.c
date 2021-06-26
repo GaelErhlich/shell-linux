@@ -2,12 +2,24 @@
 
 
 #include <unistd.h>
+#include <stdlib.h>
 
 
 
 
-/* The active jobs are linked into a list.  This is its head.   */
-struct job* first_job = NULL;
+
+/* Creer une instance de process */
+struct process* nouvProcess() {
+    struct process* processPtr = malloc(sizeof(struct process));
+    if (processPtr == NULL)
+        return NULL;
+
+    return processPtr;
+}
+
+
+
+
 //Here are some utility functions that are used for operating on job objects.
 
 /* Find the active job with the indicated pgid.  */

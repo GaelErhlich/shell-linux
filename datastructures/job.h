@@ -34,6 +34,12 @@ typedef struct job
 struct job* first_job;
 
 
+
+/* Creer une instance de process */
+struct process* nouvProcess();
+
+
+
 /* Find the active job with the indicated pgid.  */
 struct job* find_job(pid_t pgid);
 

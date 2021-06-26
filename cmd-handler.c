@@ -2,6 +2,9 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "datastructures/job.h"
 
@@ -16,6 +19,10 @@
 
 
 
+
+
+
+
 int handleCommand(char* cmd) {
 	size_t len = strlen(cmd);
 	
@@ -25,6 +32,8 @@ int handleCommand(char* cmd) {
 	int i = 0;
 
 	struct job j;
+	int idesc = 0;
+	int odesc = 0;
 
 
 	while (motPtr != NULL) {
@@ -37,9 +46,10 @@ int handleCommand(char* cmd) {
 		if (motPtr[0] == '<') {
 			printf("Entr�e : %s\n", motPtr);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
-				perror("Erreur syntaxe : '<' ne peut pas �tre plac� ici.\n");
+				perror("Erreur syntaxe : '<' ne peut pas être placé ici.\n");
 				return -1;
 			}
+
 			prochain = PROCHAIN_TOKEN_ENTREE;
 		}
 		
@@ -52,6 +62,7 @@ int handleCommand(char* cmd) {
 				perror("Erreur syntaxe : '>' ne peut pas �tre plac� ici.\n");
 				return -1;
 			}
+
 			prochain = PROCHAIN_TOKEN_SORTIE;
 		}
 
@@ -59,7 +70,7 @@ int handleCommand(char* cmd) {
 		//	S�parateur de programmes
 		// ----------------------------
 		else if (motPtr[0] == '|') {
-			printf("S�parateur : %s\n", motPtr);
+			printf("Séparateur : %s\n", motPtr);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '|' ne peut pas �tre plac� ici.\n");
 				return -1;
@@ -72,10 +83,43 @@ int handleCommand(char* cmd) {
 		// ----------------------------
 		else {
 			printf("Fichier : %s\n", motPtr);
-			if (prochain == PROCHAIN_TOKEN_SYMBOLE) {
-				perror("Erreur syntaxe : un symbole �tait attendu ici ('<', '>', '|').\n");
-				return -1;
+			switch (prochain)
+			{
+
+				case PROCHAIN_TOKEN_ENTREE:;
+					idesc = open(motPtr, O_RDONLY);
+					if (idesc == -1) {
+						perror("Le fichier d'entree n'a pas ete trouve.\n");
+						return -1;
+					}
+					
+					j.stdin = idesc;
+					break;
+
+
+				case PROCHAIN_TOKEN_SORTIE:;
+					odesc = open(motPtr, O_WRONLY | O_CREAT | O_EXCL, 0666);
+					if (odesc == -1) {
+						perror("Une erreur s'est produite lors de l'ouverture du flux de sortie.\n");
+						return -1;
+					}
+
+					j.stdout = odesc;
+					break;
+
+
+				case PROCHAIN_TOKEN_FICHIER:;
+					struct process* process = nouvProcess();
+					// TODO
+					
+					break;
+
+				
+			default:
+				break;
 			}
+			
+
 			prochain = PROCHAIN_TOKEN_SYMBOLE;
 		}
 
@@ -97,10 +141,6 @@ int handleCommand(char* cmd) {
 	}
 
 
-
-	for (int i = 0; i < len; i++) {
-		printf("- %c\n", cmd[i]);
-	}
 
 	return 0;
 }
