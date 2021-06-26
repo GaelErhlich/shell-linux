@@ -32,12 +32,12 @@ int handleCommand(char* cmd) {
 
 
 		// ----------------------------
-		//	Entrée du flux
+		//	Entrï¿½e du flux
 		// ----------------------------
 		if (motPtr[0] == '<') {
-			printf("Entrée : %s\n", motPtr);
+			printf("Entrï¿½e : %s\n", motPtr);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
-				perror("Erreur syntaxe : '<' ne peut pas être placé ici.\n");
+				perror("Erreur syntaxe : '<' ne peut pas ï¿½tre placï¿½ ici.\n");
 				return -1;
 			}
 			prochain = PROCHAIN_TOKEN_ENTREE;
@@ -49,19 +49,19 @@ int handleCommand(char* cmd) {
 		else if (motPtr[0] == '>') {
 			printf("Sortie : %s\n", motPtr);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
-				perror("Erreur syntaxe : '>' ne peut pas être placé ici.\n");
+				perror("Erreur syntaxe : '>' ne peut pas ï¿½tre placï¿½ ici.\n");
 				return -1;
 			}
 			prochain = PROCHAIN_TOKEN_SORTIE;
 		}
 
 		// ----------------------------
-		//	Séparateur de programmes
+		//	Sï¿½parateur de programmes
 		// ----------------------------
 		else if (motPtr[0] == '|') {
-			printf("Séparateur : %s\n", motPtr);
+			printf("Sï¿½parateur : %s\n", motPtr);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
-				perror("Erreur syntaxe : '|' ne peut pas être placé ici.\n");
+				perror("Erreur syntaxe : '|' ne peut pas ï¿½tre placï¿½ ici.\n");
 				return -1;
 			}
 			prochain = PROCHAIN_TOKEN_FICHIER;
@@ -73,7 +73,7 @@ int handleCommand(char* cmd) {
 		else {
 			printf("Fichier : %s\n", motPtr);
 			if (prochain == PROCHAIN_TOKEN_SYMBOLE) {
-				perror("Erreur syntaxe : un symbole était attendu ici ('<', '>', '|').\n");
+				perror("Erreur syntaxe : un symbole ï¿½tait attendu ici ('<', '>', '|').\n");
 				return -1;
 			}
 			prochain = PROCHAIN_TOKEN_SYMBOLE;
@@ -89,7 +89,7 @@ int handleCommand(char* cmd) {
 
 
 	// ----------------------------
-	//	Vérification rien en attente
+	//	Vï¿½rification rien en attente
 	// ----------------------------
 	if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 		perror("La commande ne peut pas finir par un symbole.\n");
