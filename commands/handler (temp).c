@@ -1,13 +1,13 @@
+/*
 #include "headers/handler.h"
-
-#include "../datastructures/headers/job.h"
 
 #include <stdio.h>
 #include <string.h>
 
+#include "../datastructures/headers/job.h"
 
 
-void handleCommand(char cmd[1024]) {
+void handleCommand(char* cmd) {
 
 	//struct job newJob = { .flag = true, .value = 123, .stuff = 0.456 };
 	// TODO : Fill newJob
@@ -64,3 +64,4 @@ void handleCommand(char cmd[1024]) {
 
 	printf("qeqchose : %ld (*) ou %ld\n", sizeof(*cmd), sizeof(cmd) );
 }
+*/

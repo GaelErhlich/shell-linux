@@ -1,5 +1,9 @@
-#include "./commands/handler.c"
-#include "./core/init.c"
+#include "./commands/handler.h"
+#include "./datastructures/job.h"
+#include "./core/job.h"
+#include "./core/init.h"
+
+
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,9 +11,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-void main() {
+int main(int argc, char* argv[]) {
   init_shell();
-  char cmd[30];
+  char cmd[32];
   char args[1024];
 
   while (1) {
@@ -51,4 +55,6 @@ void main() {
         handleCommand(args);
     }
   }
+
+  return 0;
 }
