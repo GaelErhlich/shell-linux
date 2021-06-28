@@ -9,12 +9,17 @@
 
 
 /* Creer une instance de process */
-struct process* nouvProcess() {
-    struct process* processPtr = malloc(sizeof(struct process));
-    if (processPtr == NULL)
-        return NULL;
+struct process** nouvProcess(int nbProcess) {
+    struct process** processArray = malloc(sizeof(struct process)*nbProcess);
 
-    return processPtr;
+    
+    for (int i = 0; i < nbProcess; i++) {
+        processArray[i] = malloc(sizeof(struct process));
+        if (processArray[i] == NULL)
+            return NULL;
+    }
+
+    return processArray;
 }
 
 

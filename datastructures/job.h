@@ -36,7 +36,7 @@ struct job* first_job;
 
 
 /* Creer une instance de process */
-struct process* nouvProcess();
+struct process** nouvProcess(int nbProcess);
 
 
 

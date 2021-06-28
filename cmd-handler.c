@@ -27,18 +27,32 @@
 int handleCommand(char* cmd) {
 	size_t len = strlen(cmd);
 	
+	// Variables de boucle
 	char* motPtr;
 	motPtr = strtok(cmd, " ");
 	int prochain = PROCHAIN_TOKEN_FICHIER;
 	int i = 0;
 
+	// Variables process
+	/*/ temp
+	struct process p0;
+	struct process p1;
+	// fin temp*/
+
+	struct process** processus = nouvProcess(32);
+	int iProc = 0;
+
+	// Variables job
 	struct job j;
-	int idesc = 0;
-	int odesc = 0;
+	j.command = "";
+	j.next = NULL;
+	j.notified = 0;
+	int idesc = 0; // Entrée
+	int odesc = 0; // Sortie
+	
 
 
 	while (motPtr != NULL) {
-		//printf("'%s'\n", motPtr);
 
 
 		// ----------------------------
@@ -87,6 +101,7 @@ int handleCommand(char* cmd) {
 			switch (prochain)
 			{
 
+				// Si l'entrée est attendue
 				case PROCHAIN_TOKEN_ENTREE:;
 					idesc = open(motPtr, O_RDONLY);
 					if (idesc == -1) {
@@ -98,6 +113,7 @@ int handleCommand(char* cmd) {
 					break;
 
 
+				// Si la sortie est attendue
 				case PROCHAIN_TOKEN_SORTIE:;
 					odesc = open(motPtr, O_WRONLY | O_CREAT | O_EXCL, 0666);
 					if (odesc == -1) {
@@ -109,29 +125,54 @@ int handleCommand(char* cmd) {
 					break;
 
 
+				// Si un nom de ficher est attendu
 				case PROCHAIN_TOKEN_FICHIER:;
-					struct process* process = nouvProcess();
-					j.first_process = process;
-					j.command = "";
-					j.next = NULL;
 					
-					j.notified = 0;
+					if (iProc == 0) {
+						j.first_process = processus[iProc];
+					} else {
+						processus[iProc-1]->next = processus[iProc];
+					}
+					
 
-					printf("Avant création motSlash et tabMotPtr\n");
-					char* tabMotPtr[2];
+					/*/temp
+					struct process* pPtr;
+
+					if (iProc == 0) {
+						pPtr = &p0;
+						j.first_process = pPtr;
+					}
+					else if (iProc == 1) {
+						pPtr = &p1;
+						p0.next = pPtr;
+					}
+					else {
+						printf("Erreur temp : trop de fichiers\n");
+						break;
+					}
+					//fin temp*/
+					
+
 					char motSlash[32] = "./";
 					printf("Avant concat\n");
 					strcat(motSlash, motPtr);
 					printf("Après concat\n");
+					char* tabMotPtr[2] = {motSlash, NULL};
 					tabMotPtr[0] = motSlash;
 					tabMotPtr[1] = NULL;
 					printf("Après remplissage tableau\n");
-					process->argv = tabMotPtr;
-					process->completed = 0;
-					process->stopped = 0;
+					
+					processus[iProc]->argv = tabMotPtr;
+					processus[iProc]->completed = 0;
+					processus[iProc]->stopped = 0;
+					/*/temp
+					pPtr->argv = tabMotPtr;
+					pPtr->completed = 0;
+					pPtr->stopped = 0;
+					//fin temp*/
+					printf("Après remplissage processus (1 iteration)\n");
 
-					launch_job(&j, 1);
-					// TODO
+					iProc++;
 					
 					break;
 
@@ -139,11 +180,10 @@ int handleCommand(char* cmd) {
 			default:
 				break;
 			}
-			
+
 
 			prochain = PROCHAIN_TOKEN_SYMBOLE;
 		}
-
 		// ----------------------------
 		//	Fin boucle
 		// ----------------------------
@@ -161,6 +201,8 @@ int handleCommand(char* cmd) {
 		return -1;
 	}
 
+	// Exécution du programme
+	launch_job(&j, 1);
 
 
 	return 0;
