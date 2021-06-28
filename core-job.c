@@ -50,6 +50,7 @@ void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
   }
 
   /* Exec the new process.  Make sure we exit.  */
+  printf("argv : %s, %s, %s, ...\n", p->argv[0], p->argv[1], p->argv[2]);
   execvp(p->argv[0], p->argv);
   perror("execvp");
   exit(1);

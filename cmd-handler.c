@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 #include "datastructures/job.h"
+#include "core/job.h"
 
 
 
@@ -110,6 +111,26 @@ int handleCommand(char* cmd) {
 
 				case PROCHAIN_TOKEN_FICHIER:;
 					struct process* process = nouvProcess();
+					j.first_process = process;
+					j.command = "";
+					j.next = NULL;
+					
+					j.notified = 0;
+
+					printf("Avant création motSlash et tabMotPtr\n");
+					char* tabMotPtr[2];
+					char motSlash[32] = "./";
+					printf("Avant concat\n");
+					strcat(motSlash, motPtr);
+					printf("Après concat\n");
+					tabMotPtr[0] = motSlash;
+					tabMotPtr[1] = NULL;
+					printf("Après remplissage tableau\n");
+					process->argv = tabMotPtr;
+					process->completed = 0;
+					process->stopped = 0;
+
+					launch_job(&j, 1);
 					// TODO
 					
 					break;
