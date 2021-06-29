@@ -61,7 +61,7 @@ int handleCommand(char* cmd) {
 		//	Entr�e du flux
 		// ----------------------------
 		if (args[i][0] == '<') {
-			printf("Entr�e : %s\n", args[i]);
+			//printf("Entr�e : %s\n", args[i]);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '<' ne peut pas être placé ici.\n");
 				return -1;
@@ -74,7 +74,7 @@ int handleCommand(char* cmd) {
 		//	Sortie du flux
 		// ----------------------------
 		else if (args[i][0] == '>') {
-			printf("Sortie : %s\n", args[i]);
+			//printf("Sortie : %s\n", args[i]);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '>' ne peut pas �tre plac� ici.\n");
 				return -1;
@@ -87,7 +87,7 @@ int handleCommand(char* cmd) {
 		//	S�parateur de programmes
 		// ----------------------------
 		else if (args[i][0] == '|') {
-			printf("Séparateur : %s\n", args[i]);
+			//printf("Séparateur : %s\n", args[i]);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '|' ne peut pas �tre plac� ici.\n");
 				return -1;
@@ -108,7 +108,7 @@ int handleCommand(char* cmd) {
 		//	Fichier
 		// ----------------------------
 		else {
-			printf("Fichier : %s\n", args[i]);
+			//printf("Fichier : %s\n", args[i]);
 			switch (prochain)
 			{
 

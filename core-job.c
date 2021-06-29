@@ -13,7 +13,6 @@
 void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
                     int errfile, int foreground) {
   pid_t pid;
-  printf("Début launch_process\n");
 
   if (shell_is_interactive) {
     /* Put the process into the process group and give the process group
@@ -27,7 +26,6 @@ void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
     if (foreground)
       tcsetpgrp(shell_terminal, pgid);
 
-    printf("Après getpid()\n");
 
     /* Set the handling for job control signals back to the default.  */
     signal(SIGINT, SIG_DFL);
@@ -38,22 +36,16 @@ void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
     signal(SIGCHLD, SIG_DFL);
   }
 
-  printf("Après signal\n");
-  printf("Après signal (2) : -i %d -o %d\n", infile, outfile);
 
   /* Set the standard input/output channels of the new process.  */
   if (infile != STDIN_FILENO) {
     dup2(infile, STDIN_FILENO);
     close(infile);
   }
-  printf("Après signal (3)\n");
-  printf("STDOUT_FILENO : %d, outfile : %d\n", STDOUT_FILENO, outfile);
   if (outfile != STDOUT_FILENO) {
     dup2(outfile, STDOUT_FILENO);
-    //printf("Entre dup2 et close(outfile)\n");
     close(outfile);
   }
-  //printf("Après signal (4)\n");
   if (errfile != STDERR_FILENO) {
     dup2(errfile, STDERR_FILENO);
     close(errfile);
@@ -69,20 +61,18 @@ void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
 }
 
 void launch_job(struct job *j, int foreground) {
-    printf("Debut launch_job, avec in %d et out %d, et foreground %d\n", j->stdin, j->stdout, foreground);
+    //printf("Debut launch_job, avec in %d et out %d, et foreground %d\n", j->stdin, j->stdout, foreground);
   struct process *p;
   pid_t pid;
   int mypipe[2], infile, outfile;
 
   infile = j->stdin;
-  printf("Avant boucle processus exec\n");
   for (p = j->first_process; p; p = p->next) {
-      printf("Debut boucle processus exec\n");
-      if (p->next) {
+      /*if (p->next) {
         printf("1 processus : %s, %s, %s (suiv : %s)\n", p->argv[0], p->argv[1], p->argv[2], p->next->argv[0]);
       } else {
           printf("1 processus : %s, %s, %s (suiv : %s)\n", p->argv[0], p->argv[1], p->argv[2], "aucun");
-      }
+      }*/
       
     /* Set up pipes, if necessary.  */
     if (p->next) {
@@ -115,16 +105,16 @@ void launch_job(struct job *j, int foreground) {
 
     /* Clean up after pipes.  */
     
-    /*
+    
     if (infile != j->stdin)
       close(infile);
     if (outfile != j->stdout)
       close(outfile);
-    */
+    
     infile = mypipe[0];
   }
 
-  format_job_info(j, "launched");
+  //format_job_info(j, "launched");
 
   if (!shell_is_interactive)
     wait_for_job(j);
