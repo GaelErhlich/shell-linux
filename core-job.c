@@ -69,7 +69,7 @@ void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
 }
 
 void launch_job(struct job *j, int foreground) {
-    printf("Debut launch_job, avec in %d et out %d\n", j->stdin, j->stdout);
+    printf("Debut launch_job, avec in %d et out %d, et foreground %d\n", j->stdin, j->stdout, foreground);
   struct process *p;
   pid_t pid;
   int mypipe[2], infile, outfile;
