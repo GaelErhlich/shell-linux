@@ -1,4 +1,4 @@
-#include "./cp.h"
+#include "./commands/cp.h"
 #include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
@@ -120,4 +120,5 @@ int maincp(int argc, char *argv[]) {
   if (argc - optind >= 2) {
     copy(argc - optind, argv + optind, recursive);
   }
+  return 0;
 }
