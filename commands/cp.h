@@ -1,0 +1,1 @@
+int maincp(int argc, char *argv[]);

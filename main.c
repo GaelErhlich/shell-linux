@@ -1,7 +1,9 @@
+#include "./commands/cp.h"
 #include "./commands/handler.h"
 #include "./core/init.h"
 #include "./core/job.h"
 #include "./datastructures/job.h"
+#include "./utils/stringUtils.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -23,9 +25,6 @@ int main(int argc, char *argv[]) {
     }
     fscanf(stdin, "%s", cmd);
     fgets(args, 100, stdin);
-
-    printf("Command Entered : %s \n", cmd);
-    printf("Arguments entered : %s \n", args);
     size_t i = 1;
     while (1) {
       if (args[i] == 10) {
