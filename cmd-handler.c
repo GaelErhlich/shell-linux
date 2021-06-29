@@ -100,7 +100,7 @@ int handleCommand(char* cmd) {
 		//	Inverseur de plan (switch foreground/background)
 		// ----------------------------
 		else if (args[i][0] == '*' && strlen(args[i]) == 1) {
-			printf("Foreground : %s\n", args[i]);
+			//printf("Foreground : %s\n", args[i]);
 			isForeground = !isForeground;
 		}
 
@@ -184,6 +184,10 @@ int handleCommand(char* cmd) {
 	}
 
 	// Exécution du programme
+	if (!isForeground && (j.stdin == STDIN_FILENO || j.stdout == STDOUT_FILENO) ) {
+		perror("Vous avez demande une execution en mode background, mais n'avez defini ni entree ni sortie.");
+		return -1;
+	}
 	launch_job(&j, isForeground);
 
 	return 0;
