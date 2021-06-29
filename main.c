@@ -1,8 +1,7 @@
 #include "./commands/handler.h"
-#include "./datastructures/job.h"
-#include "./core/job.h"
 #include "./core/init.h"
-
+#include "./core/job.h"
+#include "./datastructures/job.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -11,38 +10,40 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-
-
-
-
 void testsStrtokToFullStringArg() {
-    char cmd[128] = "Hier j'ai voulu manger une pomme de type \"pomme golden\" et, c'est de mon point de vue exquis.";
-    
-    char* args[64];
-    int nbArgs;
-    splitStringCmd(cmd, args, &nbArgs);
+  char cmd[128] = "Hier j'ai voulu manger une pomme de type \"pomme golden\" "
+                  "et, c'est de mon point de vue exquis.";
 
-    if (strcmp(args[0], "Hier")) { printf("Erreur : splitStringCmd aurait du renvoyer 'Hier'. (%s)\n", args[0]); }
-    if (strcmp(args[8], "pomme golden")) { printf("Erreur : splitStringCmd aurait du renvoyer 'pomme golden'. (%s)\n", args[8]); }
-    if (strcmp(args[9], "et,")) { printf("Erreur : splitStringCmd aurait du renvoyer 'et,'. (%s)\n", args[9]); }
-    if (strcmp(args[16], "exquis.")) { printf("Erreur : splitStringCmd aurait du renvoyer 'exquis. (%s)'.\n", args[16]); }
-  
+  char *args[64];
+  int nbArgs;
+  splitStringCmd(cmd, args, &nbArgs);
+
+  if (strcmp(args[0], "Hier")) {
+    printf("Erreur : splitStringCmd aurait du renvoyer 'Hier'. (%s)\n",
+           args[0]);
+  }
+  if (strcmp(args[8], "pomme golden")) {
+    printf("Erreur : splitStringCmd aurait du renvoyer 'pomme golden'. (%s)\n",
+           args[8]);
+  }
+  if (strcmp(args[9], "et,")) {
+    printf("Erreur : splitStringCmd aurait du renvoyer 'et,'. (%s)\n", args[9]);
+  }
+  if (strcmp(args[16], "exquis.")) {
+    printf("Erreur : splitStringCmd aurait du renvoyer 'exquis. (%s)'.\n",
+           args[16]);
+  }
 }
 
+int main(int argc, char *argv[]) {
 
-
-
-
-
-int main(int argc, char* argv[]) {
-
-    testsStrtokToFullStringArg();
+  testsStrtokToFullStringArg();
 
   init_shell();
-  char cmd[32];
-  char args[1024];
 
   while (1) {
+    char cmd[32];
+    char args[1024];
     char cwd[PATH_MAX];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
       printf("%s$ ", cwd);
@@ -65,6 +66,12 @@ int main(int argc, char* argv[]) {
       i++;
     }
     memcpy(args, args + 1, sizeof(args) - 1);
+    char fullCmd[1024];
+    strcat(fullCmd, cmd);
+    char space[] = " ";
+    strcat(fullCmd, space);
+    strcat(fullCmd, args);
+
     if (!strcmp(cmd, "exit")) {
       exit(1);
     } else if (!strcmp(cmd, "cd")) {
@@ -76,9 +83,13 @@ int main(int argc, char* argv[]) {
         perror("Failed");
       }
     } else if (!strcmp(cmd, "cp")) {
-    }
-    else {
-        handleCommand(args);
+      char *argsSplit[3];
+      int argsNum;
+      splitStringCmd(fullCmd, argsSplit, &argsNum);
+      maincp(argsNum, argsSplit);
+
+    } else {
+      handleCommand(fullCmd);
     }
   }
 
