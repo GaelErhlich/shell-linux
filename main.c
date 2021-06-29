@@ -18,7 +18,9 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     char cmd[32];
+    strcpy(cmd, "");
     char args[1024];
+    strcpy(args, "");
     char cwd[PATH_MAX];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
       printf("%s$ ", cwd);
@@ -39,6 +41,7 @@ int main(int argc, char *argv[]) {
     }
     memcpy(args, args + 1, sizeof(args) - 1);
     char fullCmd[1024];
+    strcpy(fullCmd, "");
     strcat(fullCmd, cmd);
     char space[] = " ";
     strcat(fullCmd, space);
