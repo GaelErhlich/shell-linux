@@ -11,6 +11,9 @@
 #include "datastructures/job.h"
 #include "core/job.h"
 
+#include "utils/stringUtils.h"
+
+
 
 
 
@@ -19,91 +22,28 @@
 #define PROCHAIN_TOKEN_SYMBOLE		1
 #define PROCHAIN_TOKEN_ENTREE		2
 #define PROCHAIN_TOKEN_SORTIE		3
-#define PROCHAIN_TOKEN_SYMBouARG	4
 
-
-
-
-
-/*
-	Divise une commande (cmd) en un tableau d'arguments (args, de taille definie a l'avance)
-*/
-
-int splitStringCmd(char* cmd, char** args, int* len) {
-	char* mot = malloc(sizeof(char) * 2048);
-	char argTemp[4096];
-	int i = 0;
-
-	int isQuoteOpen = 0;
-	mot = strtok(cmd, " ");
-
-	while (mot != NULL) {
-		if (!isQuoteOpen) {
-			if (mot[0] == '"') { // Si l'argument commence par un guillemet, on va laisser les mots s'accumuler
-				mot++; // Suppression du premier char (le guillemet)
-				strcpy(argTemp, mot);
-				mot--;
-				isQuoteOpen = 1;
-			}
-			else { // Si l'argument ne commence pas par un guillemet, alors on le renvoie directement
-				args[i] = malloc(sizeof(char) * strlen(mot));
-				strcpy(args[i], mot);
-				i++;
-			}
-		}
-
-		// Si on n'a pas renvoyé, on vérifie qu'on n'a pas un guillemet de fin et on ajoute
-		else {
-			strcat(argTemp, " ");
-			strcat(argTemp, mot);
-
-			if (mot[strlen(mot) - 1] == '"') {
-				argTemp[strlen(argTemp) - 1] = '\0';
-				args[i] = malloc(sizeof(char) * strlen(argTemp));
-				strcpy(args[i], argTemp);
-				isQuoteOpen = 0;
-				i++;
-			}
-		}
-
-		mot = strtok(NULL, " ");
-	}
-
-	i++;
-	len[0] = i;
-	free(mot);
-
-	if (isQuoteOpen) {
-		printf("L'argument %s ne se termine jamais (par un guillemet).\n", argTemp);
-		return -1;
-	}
-	return 0;
-}
-
-
+#define MAX_ARGS_CMD	64
 
 
 
 int handleCommand(char* cmd) {
-	size_t len = strlen(cmd);
 	
 	// Variables de boucle
-	char* motPtr;
-	motPtr = strtok(cmd, " ");
+	char* args[MAX_ARGS_CMD];
+	int nbArgs;
+	int result = splitStringCmd(cmd, args, &nbArgs);
+	if (result == -1) {
+		return -1;
+	}
 	int prochain = PROCHAIN_TOKEN_FICHIER;
-	int i = 0;
-
-	// Variables process
-	/*/ temp
-	struct process p0;
-	struct process p1;
-	// fin temp*/
 
 	struct process** processus = nouvProcess(32);
 	int iProc = 0;
 
 	// Variables job
 	struct job j;
+	int isForeground = 1; // Par défaut, on met la commande au premier plan
 	j.command = "";
 	j.next = NULL;
 	j.notified = 0;
@@ -114,14 +54,14 @@ int handleCommand(char* cmd) {
 	
 
 
-	while (motPtr != NULL) {
+	for(int i = 0; i < nbArgs; i++) {
 
 
 		// ----------------------------
 		//	Entr�e du flux
 		// ----------------------------
-		if (motPtr[0] == '<') {
-			printf("Entr�e : %s\n", motPtr);
+		if (args[i][0] == '<') {
+			//printf("Entr�e : %s\n", args[i]);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '<' ne peut pas être placé ici.\n");
 				return -1;
@@ -133,8 +73,8 @@ int handleCommand(char* cmd) {
 		// ----------------------------
 		//	Sortie du flux
 		// ----------------------------
-		else if (motPtr[0] == '>') {
-			printf("Sortie : %s\n", motPtr);
+		else if (args[i][0] == '>') {
+			//printf("Sortie : %s\n", args[i]);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '>' ne peut pas �tre plac� ici.\n");
 				return -1;
@@ -146,8 +86,8 @@ int handleCommand(char* cmd) {
 		// ----------------------------
 		//	S�parateur de programmes
 		// ----------------------------
-		else if (motPtr[0] == '|') {
-			printf("Séparateur : %s\n", motPtr);
+		else if (args[i][0] == '|') {
+			//printf("Séparateur : %s\n", args[i]);
 			if (prochain != PROCHAIN_TOKEN_SYMBOLE) {
 				perror("Erreur syntaxe : '|' ne peut pas �tre plac� ici.\n");
 				return -1;
@@ -155,17 +95,26 @@ int handleCommand(char* cmd) {
 			prochain = PROCHAIN_TOKEN_FICHIER;
 		}
 
+
+		// ----------------------------
+		//	Inverseur de plan (switch foreground/background)
+		// ----------------------------
+		else if (args[i][0] == '*' && strlen(args[i]) == 1) {
+			//printf("Foreground : %s\n", args[i]);
+			isForeground = !isForeground;
+		}
+
 		// ----------------------------
 		//	Fichier
 		// ----------------------------
 		else {
-			printf("Fichier : %s\n", motPtr);
+			//printf("Fichier : %s\n", args[i]);
 			switch (prochain)
 			{
 
 				// Si l'entrée est attendue
 				case PROCHAIN_TOKEN_ENTREE:;
-					idesc = open(motPtr, O_RDONLY);
+					idesc = open(args[i], O_RDONLY);
 					if (idesc == -1) {
 						perror("Le fichier d'entree n'a pas ete trouve.\n");
 						return -1;
@@ -178,7 +127,7 @@ int handleCommand(char* cmd) {
 
 				// Si la sortie est attendue
 				case PROCHAIN_TOKEN_SORTIE:;
-					odesc = open(motPtr, O_WRONLY | O_CREAT | O_EXCL, 0666);
+					odesc = open(args[i], O_WRONLY | O_CREAT | O_EXCL, 0666);
 					if (odesc == -1) {
 						perror("Une erreur s'est produite lors de l'ouverture du flux de sortie.\n");
 						return -1;
@@ -199,29 +148,19 @@ int handleCommand(char* cmd) {
 					}
 
 					char motSlash[32] = "./";
-					printf("Avant concat\n");
-					strcat(motSlash, motPtr);
-					printf("Après concat\n");
-					char* tabMotPtr[16];
-					tabMotPtr[0] = motSlash;
-					tabMotPtr[1] = "moi";
-					tabMotPtr[2] = NULL;
-					printf("Après remplissage tableau\n");
+					strcat(motSlash, args[i]);
+					char* tabMotPtr[33];
+					int lenTab;
+					splitStringCmd(motSlash, tabMotPtr, &lenTab);
+					tabMotPtr[lenTab] = NULL;
 					
 					processus[iProc]->argv = tabMotPtr;
 					processus[iProc]->completed = 0;
 					processus[iProc]->stopped = 0;
-					printf("Après remplissage processus (1 iteration)\n");
 
 					iProc++;
-					prochain = PROCHAIN_TOKEN_SYMBOLE; //TODO Remplacer
+					prochain = PROCHAIN_TOKEN_SYMBOLE;
 					
-					break;
-
-
-				
-				// Si cet argument n'est pas un symbole reconnu, on le considère comme argument de la dernière commande
-				case PROCHAIN_TOKEN_SYMBouARG:
 					break;
 
 
@@ -229,15 +168,10 @@ int handleCommand(char* cmd) {
 				
 			default:
 				perror("Un fichier n'était pas attendu ici.\n");
+				return -1;
 				break;
 			}
 		}
-		// ----------------------------
-		//	Fin boucle
-		// ----------------------------
-
-		motPtr = strtok(NULL, " ");
-		i++;
 	}
 
 
@@ -250,8 +184,11 @@ int handleCommand(char* cmd) {
 	}
 
 	// Exécution du programme
-	launch_job(&j, 1);
-
+	if (!isForeground && (j.stdin == STDIN_FILENO || j.stdout == STDOUT_FILENO) ) {
+		perror("Vous avez demande une execution en mode background, mais n'avez defini ni entree ni sortie.");
+		return -1;
+	}
+	launch_job(&j, isForeground);
 
 	return 0;
 }
