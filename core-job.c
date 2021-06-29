@@ -50,25 +50,26 @@ void launch_process(struct process *p, pid_t pgid, int infile, int outfile,
   printf("STDOUT_FILENO : %d, outfile : %d\n", STDOUT_FILENO, outfile);
   if (outfile != STDOUT_FILENO) {
     dup2(outfile, STDOUT_FILENO);
+    //printf("Entre dup2 et close(outfile)\n");
     close(outfile);
   }
-  printf("Après signal (4)\n");
+  //printf("Après signal (4)\n");
   if (errfile != STDERR_FILENO) {
     dup2(errfile, STDERR_FILENO);
     close(errfile);
   }
 
-  printf("Après set standard i/o channels of process\n");
+  //printf("Après set standard i/o channels of process\n");
 
   /* Exec the new process.  Make sure we exit.  */
-  printf("argv : %s, %s, %s, ...\n", p->argv[0], p->argv[1], p->argv[2]);
+  //printf("argv : %s, %s, %s, ...\n", p->argv[0], p->argv[1], p->argv[2]);
   execvp(p->argv[0], p->argv);
   perror("execvp");
   exit(1);
 }
 
 void launch_job(struct job *j, int foreground) {
-    printf("Debut launch_job\n");
+    printf("Debut launch_job, avec in %d et out %d\n", j->stdin, j->stdout);
   struct process *p;
   pid_t pid;
   int mypipe[2], infile, outfile;
@@ -113,10 +114,13 @@ void launch_job(struct job *j, int foreground) {
     }
 
     /* Clean up after pipes.  */
+    
+    /*
     if (infile != j->stdin)
       close(infile);
     if (outfile != j->stdout)
       close(outfile);
+    */
     infile = mypipe[0];
   }
 
